@@ -24,6 +24,7 @@ var options = {
     cert: fs.readFileSync(path.join(__dirname, 'cacert.pem'))
 };
 options.agent = new httpsCreator.Agent(options);
+
 httpsCreator.createServer(options, function (request, response) {
     request.url = request.url.replace(program.path, '');
     var dotUrls = [];
