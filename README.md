@@ -19,7 +19,11 @@ npm install meixin-h5-proxy --save-dev
 
 然后可以直接通过如下命令进行代理
 ```
-proxy -d "D:\work\mshop svn\trunk\Public\mshop_svn_resources\src" -p "/m/app/src"
+node ./command.js -d "/Users/zhangmike/WebstormProjects/gomeplus/h5/dist" -p "/m/h5/dist" -f "/Users/zhangmike/WebstormProjects/gomeplus/public/dist/js/"
+```
+
+```
+node ./command.js -d "/Users/zhangmike/WebstormProjects/gomeplus/branches/h5Refactor/src" -p "/m/h5/src,src" -f "/Users/zhangmike/WebstormProjects/gomeplus/public/gomeplusJS/dist/" -o 8011
 ```
 
 可以通过
