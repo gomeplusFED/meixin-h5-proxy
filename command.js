@@ -34,7 +34,25 @@ httpCreator.createServer(function (request, response) {
 }).listen(parseInt(program.port ? program.port : 80));
 
 function doProxy(request, response) {
-    request.url = request.url.replace(program.path, '');
+    // console.log("before...", request.url);
+    var pa = program.path.split(",");
+    pa.sort(function(a, b){
+        if (a.length < b.length) {
+            return 1;
+        }else if (a.length > b.length) {
+            return -1;
+        }else {
+            return 0;
+        }
+    });
+    pa = pa.filter(function(cur){
+        if (request.url.indexOf(cur) != -1){
+            return cur;
+        }
+    });
+
+    request.url = request.url.replace(pa[0], '');
+
     var dotUrls = [];
     request.addListener('end', function () {
         response.setHeader("Access-Control-Allow-Origin", "*");
@@ -67,6 +85,7 @@ function doProxy(request, response) {
             }
         } else {
             var fUrl = program.dir + request.url;
+            // console.log("after...", fUrl);
             fileContents = fs.readFileSync(fUrl.match(/^([^\?]*)\??.*$/)[1], 'utf-8');
             response.write(fileContents);
             response.end();
