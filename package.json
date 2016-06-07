@@ -1,6 +1,6 @@
 {
   "name": "gomeplus-h5-proxy",
-  "version": "1.0.12",
+  "version": "1.0.14",
   "description": "美信H5 CDN代理模块",
   "main": "command.js",
   "scripts": {

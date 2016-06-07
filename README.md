@@ -37,9 +37,16 @@ node ./command.js -d "/Users/zhangmike/WebstormProjects/gomeplus/branches/h5Refa
 ```
 
 ```
-node ./command.js -r '{"/Users/zhangmike/WebstormProjects/gomeplus/h5/dist":["/m/h5/dist","/src"],"/Users/zhangmike/WebstormProjects/gomeplus/public/gomeplusJS/dist/":["/m/public/gomeplusJS/dist/"]}' -f "/Users/zhangmike/WebstormProjects/gomeplus/public/gomeplusJS/dist/"
+MAC && LINUX    
+proxy -r '{"/Users/zhangmike/WebstormProjects/gomeplus/h5/dist":["/m/h5/dist","/src"],"/Users/zhangmike/WebstormProjects/gomeplus/public/gomeplusJS/dist/":["/m/public/gomeplusJS/dist/"]}' -f "/Users/zhangmike/WebstormProjects/gomeplus/public/gomeplusJS/dist/"  
 ```
 
+
+
+```
+WINDOWS    
+proxy -r {\"D:/workspace/h5/dist\":[\"/m/h5/dist\",\"/src\"],\"D:/workspace/public/gomeplusJS/dist/\":[\"/m/public/gomeplusJS/dist/\"]} -f "D:/workspace/public/gomeplusJS/dist/"
+```
 可以通过
 ```
 proxy -h
