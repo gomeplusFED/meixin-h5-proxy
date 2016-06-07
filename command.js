@@ -12,6 +12,7 @@ program
     .option('-s, --ports <path>', 'https portal, default 443')
     .option('-p, --path <path>', 'middle path,default /m/app/src', '/m/app/src')
     .option('-f, --foreign <path>', 'public dependencies path')
+    .option('-r, --raw <path>', 'raw path')
     .parse(process.argv);
 
 
@@ -26,33 +27,46 @@ var options = {
 options.agent = new httpsCreator.Agent(options);
 
 httpsCreator.createServer(options, function (request, response) {
-    doProxy(request, response);
+    if (program.raw) {
+        doRawProxy(request, response);
+    }else {
+        doProxy(request, response);
+    }
 }).listen(parseInt(program.ports ? program.ports : 443));
 
 httpCreator.createServer(function (request, response) {
-    doProxy(request, response);
+    if (program.raw) {
+        doRawProxy(request, response);
+    }else {
+        doProxy(request, response);
+    }
 }).listen(parseInt(program.port ? program.port : 80));
 
-function doProxy(request, response) {
-    // console.log("before...", request.url);
-    var pa = program.path.split(",");
-    pa.sort(function(a, b){
-        if (a.length < b.length) {
-            return 1;
-        }else if (a.length > b.length) {
-            return -1;
-        }else {
-            return 0;
-        }
-    });
-    pa = pa.filter(function(cur){
-        if (request.url.indexOf(cur) != -1){
-            return cur;
-        }
-    });
+function doRawProxy(request, response) {
+    try {
+        var raw = JSON.parse(program.raw);
+        //console.log("raw...", raw, JSON.stringify(raw));
+        var sPath = '';
+        var lPath = '';
+        Object.keys(raw).forEach(function (current){
+            sortArray(raw[current]).filter(function(path){
+                if (request.url.indexOf(path) != -1){
+                    sPath = path;
+                    lPath = current;
+                    return;
+                }
+            });
+        });
 
-    request.url = request.url.replace(pa[0], '');
+        request.url = request.url.replace(sPath, '');
 
+        doInnerProxy(request, response, lPath);
+    }catch (e) {
+        console.log(e);
+    }
+};
+
+function doInnerProxy(request, response, localPath) {
     var dotUrls = [];
     request.addListener('end', function () {
         response.setHeader("Access-Control-Allow-Origin", "*");
@@ -64,11 +78,12 @@ function doProxy(request, response) {
             dotUrls = dotUrls.map(function (current) {
                 return program.foreign + current;
             });
-
+            //console.log("??....",request.url, dotUrls);
             try {
                 dotUrls.forEach(function (current) {
                     promiseArr.push(when.promise(function (resolve) {
                         fs.readFile(current, 'utf-8', function (error, data) {
+                           // console.log("fileData....", data);
                             resolve(data.toString());
                         });
                     }));
@@ -80,17 +95,54 @@ function doProxy(request, response) {
                     response.write(fileContents);
                     response.end();
                 });
-            }catch (e) {
+            } catch (e) {
                 console.log(e);
             }
         } else {
-            var fUrl = program.dir + request.url;
+            var fUrl = localPath + request.url;
             // console.log("after...", fUrl);
             fileContents = fs.readFileSync(fUrl.match(/^([^\?]*)\??.*$/)[1], 'utf-8');
             response.write(fileContents);
             response.end();
         }
     }).resume();
+}
+function sortArray(array) {
+    array.sort(function(a, b){
+        if (a.length < b.length) {
+            return 1;
+        }else if (a.length > b.length) {
+            return -1;
+        }else {
+            return 0;
+        }
+    });
+    return array;
+}
+function doProxy(request, response) {
+    console.log("before...", request.url);
+    var pa = program.path.split(",");
+    pa.sort(function(a, b){
+        if (a.length < b.length) {
+            return 1;
+        }else if (a.length > b.length) {
+            return -1;
+        }else {
+            return 0;
+        }
+    });
+    // console.log("array...", pa);
+    pa = pa.filter(function(cur){
+        if (request.url.indexOf(cur) != -1){
+            return cur;
+        }
+    });
+
+    request.url = request.url.replace(pa[0], '');
+
+    // console.log("after...", pa[0], request.url);
+
+    doInnerProxy(request, response, program.dir);
 }
 
 console.log('start proxy.');
