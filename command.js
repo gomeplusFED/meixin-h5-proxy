@@ -27,6 +27,9 @@ var options = {
 options.agent = new httpsCreator.Agent(options);
 
 httpsCreator.createServer(options, function (request, response) {
+    if (request.url.indexOf('favicon.ico') !=-1) {
+        return;
+    }
     if (program.raw) {
         doRawProxy(request, response);
     }else {
@@ -35,6 +38,9 @@ httpsCreator.createServer(options, function (request, response) {
 }).listen(parseInt(program.ports ? program.ports : 443));
 
 httpCreator.createServer(function (request, response) {
+    if (request.url.indexOf('favicon.ico') !=-1) {
+        return;
+    }
     if (program.raw) {
         doRawProxy(request, response);
     }else {
