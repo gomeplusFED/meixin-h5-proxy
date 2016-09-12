@@ -33,5 +33,13 @@
   "bugs": {
     "url": "https://github.com/gomeplusFED/meixin-h5-proxy/issues"
   },
-  "homepage": "https://github.com/gomeplusFED/meixin-h5-proxy#readme"
+  "homepage": "https://github.com/gomeplusFED/meixin-h5-proxy#readme",
+  "cmd2app": {
+    "title": "美信H5 CDN代理模块",
+    "group": [
+      {
+        "title": ""
+      }
+    ]
+  }
 }
